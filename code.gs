@@ -2,9 +2,9 @@
 // based on the API's used in the code.
 
 CHANNEL_VIDEOS_SHEET_NAME = "Channel Videos List";
-CHANNEL_VIDEOS_SHEET_HEADER = "Video Title", "Video ID", "Video Description", "Thumbnail", "Video URL";
+CHANNEL_VIDEOS_SHEET_HEADER = ["Video Title", "Video ID", "Video Description", "Thumbnail", "Video URL"];
 FILE_UPLOAD_LIST_SHEET_NAME = "File Upload List";
-FILE_UPLOAD_LIST_SHEET_HEADER = "File Name", "File ID", "Title", "Description", "Tags", "YouTube URL"
+FILE_UPLOAD_LIST_SHEET_HEADER = ["File Name", "File ID", "Title", "Description", "Tags", "YouTube URL"];
 CHANNEL_ID = SpreadsheetApp.getActive().getRange("Config!B4").getValue();
 
 function onOpen() {
@@ -23,7 +23,7 @@ function listMyUploads() {
   var channelID = SpreadsheetApp.getActive().getRange("Config!B3").getValue();
   var sheet = SpreadsheetApp.getActive().getSheetByName(CHANNEL_VIDEOS_SHEET_NAME);
   var valuesForSheet = []; //File array to be written to sheet in the end
-  valuesForSheet.push([CHANNEL_VIDEOS_SHEET_HEADER]);
+  valuesForSheet.push(CHANNEL_VIDEOS_SHEET_HEADER);
 
   var results = YouTube.Channels.list('contentDetails', { id: channelID/* mine: true*/ });
   for (var i in results.items) {
@@ -159,18 +159,14 @@ function addFilesToList(fromFolder, list) {
 
 function pullFilesFromRootFolder()
 {
-  Logger.log("test");
-  
   var folderList = [];
   var rootFolderId = SpreadsheetApp.getActive().getRange("Config!B4").getValue();
-  folderList.push(rootFolderId);
-  Logger.log("root folder ID: " + rootFolderId)
   folderList = traverseDriveFolderforSubFolders(rootFolderId, folderList);
 
   var searchString = "(parents in '";
   var sheet = SpreadsheetApp.getActive().getSheetByName("File Upload List");
   var valuesForSheet = []; //File array to be written to sheet in the end
-  valuesForSheet.push([FILE_UPLOAD_LIST_SHEET_HEADER]);
+  valuesForSheet.push(FILE_UPLOAD_LIST_SHEET_HEADER);
 
   for(var i in folderList){
     var folderID = folderList[i];
@@ -210,15 +206,3 @@ function traverseDriveFolderforSubFolders (rootFolderId, folderList) {
 
   return folderList;
 }
-
-
-
-
-
-
-
-
-
-
-
-
