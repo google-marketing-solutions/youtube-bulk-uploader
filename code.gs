@@ -87,6 +87,8 @@ function uploadFiles() {
     // r[2] - Video title
     // r[3] - Video description
     // r[4] - Video tags
+    // r[5] - Made For Kids
+
     for (var i in values) {
       var r = values[i];
       var fileID = r[1];
@@ -95,6 +97,7 @@ function uploadFiles() {
 
       var videoTitle = r[2];
       var videoDescription = r[3];
+      var selfDeclaredMadeForKids = r[5];
       
       if(videoDescription == "")
       {
@@ -105,6 +108,11 @@ function uploadFiles() {
       {
         videoTitle = r[0];
         videoTitle = videoTitle.replace(".mp4", "") //remove .mp4 from video title
+      }
+
+      if(selfDeclaredMadeForKids == "")
+      {
+        selfDeclaredMadeForKids = False;
       }
       
       //start uploads
@@ -119,7 +127,7 @@ function uploadFiles() {
         },
         status: {
           privacyStatus: "unlisted",
-          selfDeclaredMadeForKids: false,
+          selfDeclaredMadeForKids: r[5]
         },
       }, "snippet,status", video); 
 

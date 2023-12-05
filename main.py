@@ -85,7 +85,8 @@ def main():
     value[1] -> File ID    
     value[2] -> Title   
     value[3] -> Description   
-    value[4] -> Tags    
+    value[4] -> Tags
+    value[5] -> Self Declared Made for Kids
     '''
     values_for_sheet = []
     logCounter = 1
@@ -112,6 +113,11 @@ def main():
         else:
           tags = ""
 
+        if len(value) > 5:
+          self_declared_made_for_kids = str(value[5])
+        else:
+          self_declared_made_for_kids = False
+
         #If no title is provided, set it to file name
         if title == "":
           title = str(value[0]).replace(".mp4", "")
@@ -123,7 +129,8 @@ def main():
                 'tags': tags
             },
             'status' : {
-                'privacyStatus': 'unlisted'
+                'privacyStatus': 'unlisted',
+                'selfDeclaredMadeForKids': self_declared_made_for_kids
             }
         }
 
