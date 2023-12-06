@@ -194,12 +194,12 @@ function pullFilesFromRootFolder()
 
   while (files.hasNext()) {
     var file = files.next();
-    valuesForSheet.push([file.getName(), file.getId(), "", "", "", ""]);
-  }  
+    valuesForSheet.push([file.getName(), file.getId(), "", "", "", "", ""]);
+  }
 
   sheet.clearContents();
   var lastRow = sheet.getLastRow();
-  var range = sheet.getRange(lastRow + 1, 1, valuesForSheet.length, 6);
+  var range = sheet.getRange(lastRow + 1, 1, valuesForSheet.length, 7);
   range.setValues(valuesForSheet);
 }
 
