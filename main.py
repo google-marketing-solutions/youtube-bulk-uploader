@@ -161,6 +161,7 @@ def main():
         ).execute()
 
         #delete finished upload
+        media_body.stream().close()
         os.remove(file_name) 
 
         body = {
