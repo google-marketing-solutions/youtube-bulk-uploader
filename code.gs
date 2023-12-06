@@ -131,7 +131,7 @@ function uploadFiles() {
         },
       }, "snippet,status", video); 
 
-      sheet.getRange(currentRow, 6).setValue("https://www.youtube.com/watch?v=" + response.id); //5th row is the YouTube URL column
+      sheet.getRange(currentRow, 7).setValue("https://www.youtube.com/watch?v=" + response.id); //7th column is the YouTube URL column
       currentRow = currentRow + 1;
 
       //move uploaded files to Completed Uploads folder

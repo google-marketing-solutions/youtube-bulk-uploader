@@ -17,7 +17,7 @@ SPREADSHEET_ID = '' #Insert your spreadsheet ID here e.g. 1n9O8L-wGL3E9BSDTRRhr8
 CREDENTIALS_JSON_FILE_NAME = 'yt_credentials.json'
 CONFIG_RANGE = 'Config!A1:B3'
 UPLOAD_LIST_RANGE = 'File Upload List!A2:F101' #Max 100 uploads at a time
-UPDATE_RANGE = 'File Upload List!F2:F101'
+UPDATE_RANGE = 'File Upload List!G2:G101'
 SERVICE_PARAMS = {
     'Drive': {
         'tokenName': 'drive_token.pickle',
@@ -161,7 +161,6 @@ def main():
         ).execute()
 
         #delete finished upload
-        media_body.stream().close()
         os.remove(file_name) 
 
         body = {
