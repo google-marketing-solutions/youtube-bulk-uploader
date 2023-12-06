@@ -16,7 +16,7 @@ from apiclient.http import MediaFileUpload, MediaInMemoryUpload
 SPREADSHEET_ID = '' #Insert your spreadsheet ID here e.g. 1n9O8L-wGL3E9BSDTRRhr87voNw9tNcHmGYE-Xq3259E
 CREDENTIALS_JSON_FILE_NAME = 'yt_credentials.json'
 CONFIG_RANGE = 'Config!A1:B3'
-UPLOAD_LIST_RANGE = 'File Upload List!A2:E101' #Max 100 uploads at a time
+UPLOAD_LIST_RANGE = 'File Upload List!A2:F101' #Max 100 uploads at a time
 UPDATE_RANGE = 'File Upload List!F2:F101'
 SERVICE_PARAMS = {
     'Drive': {

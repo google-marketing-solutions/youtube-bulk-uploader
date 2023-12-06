@@ -4,7 +4,7 @@
 CHANNEL_VIDEOS_SHEET_NAME = "Channel Videos List";
 CHANNEL_VIDEOS_SHEET_HEADER = ["Video Title", "Video ID", "Video Description", "Thumbnail", "Video URL"];
 FILE_UPLOAD_LIST_SHEET_NAME = "File Upload List";
-FILE_UPLOAD_LIST_SHEET_HEADER = ["File Name", "File ID", "Title", "Description", "Tags", "YouTube URL"];
+FILE_UPLOAD_LIST_SHEET_HEADER = ["File Name", "File ID", "Title", "Description", "Tags", "Self Declared Made For Kids", "YouTube URL"];
 CHANNEL_ID = SpreadsheetApp.getActive().getRange("Config!B4").getValue();
 
 function onOpen() {
