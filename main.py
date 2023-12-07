@@ -134,13 +134,15 @@ def main():
             }
         }
 
+        media_body=MediaFileUpload(file_name, chunksize=-1, resumable=True)
+
         print("Starting YouTube Upload")
         # Call the API's videos.insert method to create and upload the video.
         insert_request = youtube_service.videos().insert(
           part=','.join(body.keys()),
           body=body,
 
-          media_body=MediaFileUpload(file_name, chunksize=-1, resumable=True)
+          media_body=media_body
           #media_body = MediaInMemoryUpload(blobObj, 'video/mp4', resumable=True)
         )
         
@@ -161,6 +163,7 @@ def main():
         ).execute()
 
         #delete finished upload
+        media_body.stream().close()
         os.remove(file_name) 
 
         body = {
