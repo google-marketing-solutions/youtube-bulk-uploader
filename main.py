@@ -1,15 +1,17 @@
 import argparse
 import sys
-import os.path
+import os
 import pickle
 import time
 import io
 import shutil
 from datetime import datetime
 from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
-from google_auth_oauthlib.flow import InstalledAppFlow
+import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
+from urllib import parse
+import google.oauth2.credentials
 
 from apiclient.http import MediaFileUpload, MediaInMemoryUpload
 
@@ -20,32 +22,30 @@ UPLOAD_LIST_RANGE = 'File Upload List!A2:F101' #Max 100 uploads at a time
 UPDATE_RANGE = 'File Upload List!G2:G101'
 SERVICE_PARAMS = {
     'Drive': {
-        'tokenName': 'drive_token.pickle',
         'serviceName': 'drive',
-        'serviceVersion': 'v3',
-        'SCOPES': ["https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+        'serviceVersion': 'v3'
     },
     'YouTube': {
-        'tokenName': 'youtube_token.pickle',
         'serviceName': 'youtube',
-        'serviceVersion': 'v3',
-        'SCOPES': ["https://www.googleapis.com/auth/youtube.upload"]
+        'serviceVersion': 'v3'
     },
     'Sheets': {
-        'tokenName': 'sheets_token.pickle',
         'serviceName': 'sheets',
-        'serviceVersion': 'v4',
-        'SCOPES': ['https://www.googleapis.com/auth/spreadsheets']
+        'serviceVersion': 'v4'
     }
 }
+SCOPES = ["https://www.googleapis.com/auth/drive.file",
+        "https://www.googleapis.com/auth/drive",
+        "https://www.googleapis.com/auth/youtube.upload",
+        "https://www.googleapis.com/auth/spreadsheets"]
 
 
 def main():
     print('____YOUTUBE UPLOAD SCRIPT STARTING_____')
-
-    sheets_service = get_service("Sheets")
-    drive_service = get_service("Drive")
-    youtube_service = get_service("YouTube")
+    creds = get_credentials()
+    sheets_service = get_service("Sheets", creds)
+    drive_service = get_service("Drive", creds)
+    youtube_service = get_service("YouTube", creds)
 
     default_video_description = ""
     
@@ -134,9 +134,10 @@ def main():
             }
         }
 
+        print("Starting YouTube Upload")
+
         media_body=MediaFileUpload(file_name, chunksize=-1, resumable=True)
 
-        print("Starting YouTube Upload")
         # Call the API's videos.insert method to create and upload the video.
         insert_request = youtube_service.videos().insert(
           part=','.join(body.keys()),
@@ -240,29 +241,52 @@ def create_new_completed_videos_folder(drive_service, parentID):
 
   return file.get('id')
 
+def get_credentials():
+    print("Getting OAuth Credentials")
+    creds = None
 
-def get_service(service_type):
+    # The file credentials.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('credentials.pickel'):
+        with open('credentials.pickel', 'rb') as token:
+            creds = pickle.load(token)
+        # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+                        CREDENTIALS_JSON_FILE_NAME,
+                        scopes=SCOPES)
+            flow.redirect_uri = 'http://localhost:8080'
+            authorization_url, state = flow.authorization_url(
+                # Enable offline access so that you can refresh an access token without
+                # re-prompting the user for permission. Recommended for web server apps.
+                access_type='offline',
+                # Enable incremental authorization. Recommended as a best practice.
+                include_granted_scopes='true',
+                prompt='consent')
+            print('\n-----------------------------------------------------------')
+            print('Click on the following URL and login with your Google account: \n%s\n' % authorization_url)
+            print('-----------------------------------------------------------')
+            print('After approving you will ecounter ERR_CONNECTION_REFUSED - This is expected.')
+            print('Copy and paste the full URL from your browsers address bar.')
+            url = input('URL: ').strip()
+            code = parse.parse_qs(parse.urlparse(url).query)['code'][0]
+            os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+            flow.fetch_token(code=code)
+            creds = flow.credentials
+            # Save the credentials for the next run
+            with open('credentials.pickel', 'wb') as token:
+                pickle.dump(creds, token)
+    return creds
+
+
+def get_service(service_type, creds):
   print("Getting " + service_type + " service...")
-  creds = None
   newService = None
   keys = SERVICE_PARAMS[service_type]
-
-  # The file token.pickle stores the user's access and refresh tokens, and is
-  # created automatically when the authorization flow completes for the first
-  # time.
-  if os.path.exists(keys['tokenName']):
-    with open(keys['tokenName'], 'rb') as token:
-        creds = pickle.load(token)
-  # If there are no (valid) credentials available, let the user log in.
-  if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-    else:
-        flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_JSON_FILE_NAME, keys['SCOPES'])
-        creds = flow.run_local_server(port=0)
-    # Save the credentials for the next run
-    with open(keys['tokenName'], 'wb') as token:
-        pickle.dump(creds, token)
     
   newService = build(keys['serviceName'], keys['serviceVersion'], credentials=creds)
   return newService
