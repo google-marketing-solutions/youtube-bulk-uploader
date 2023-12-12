@@ -25,27 +25,28 @@ SERVICE_PARAMS = {
         'serviceName': 'drive',
         'serviceVersion': 'v3'
     },
-    'YouTube': {
-        'serviceName': 'youtube',
-        'serviceVersion': 'v3'
-    },
     'Sheets': {
         'serviceName': 'sheets',
         'serviceVersion': 'v4'
+    },
+    'YouTube': {
+        'serviceName': 'youtube',
+        'serviceVersion': 'v3'
     }
 }
-SCOPES = ["https://www.googleapis.com/auth/drive.file",
-        "https://www.googleapis.com/auth/drive",
-        "https://www.googleapis.com/auth/youtube.upload",
-        "https://www.googleapis.com/auth/spreadsheets"]
 
+SCOPES = {
+    'Drive and Sheets': ["https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"],
+    'YouTube': ["https://www.googleapis.com/auth/youtube.upload"]
+}
 
 def main():
     print('____YOUTUBE UPLOAD SCRIPT STARTING_____')
-    creds = get_credentials()
-    sheets_service = get_service("Sheets", creds)
-    drive_service = get_service("Drive", creds)
-    youtube_service = get_service("YouTube", creds)
+    drive_creds = get_credentials("Drive and Sheets")
+    youtube_creds = get_credentials("YouTube")
+    sheets_service = get_service("Sheets", drive_creds)
+    drive_service = get_service("Drive", drive_creds)
+    youtube_service = get_service("YouTube", youtube_creds)
 
     default_video_description = ""
     
@@ -241,15 +242,17 @@ def create_new_completed_videos_folder(drive_service, parentID):
 
   return file.get('id')
 
-def get_credentials():
+def get_credentials(service_name):
     print("Getting OAuth Credentials")
     creds = None
 
     # The file credentials.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('credentials.pickel'):
-        with open('credentials.pickel', 'rb') as token:
+    pickel_credentials_file_name = service_name.replace(" ", "_").lower() + '.pickel'
+    scopes = SCOPES[service_name]
+    if os.path.exists(pickel_credentials_file_name):
+        with open(pickel_credentials_file_name, 'rb') as token:
             creds = pickle.load(token)
         # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -258,7 +261,7 @@ def get_credentials():
         else:
             flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
                         CREDENTIALS_JSON_FILE_NAME,
-                        scopes=SCOPES)
+                        scopes=scopes)
             flow.redirect_uri = 'http://localhost:8080'
             authorization_url, state = flow.authorization_url(
                 # Enable offline access so that you can refresh an access token without
@@ -267,6 +270,8 @@ def get_credentials():
                 # Enable incremental authorization. Recommended as a best practice.
                 include_granted_scopes='true',
                 prompt='consent')
+            print('\n-----------------------------------------------------------')
+            print(f'{service_name} authentication:')
             print('\n-----------------------------------------------------------')
             print('Click on the following URL and login with your Google account: \n%s\n' % authorization_url)
             print('-----------------------------------------------------------')
@@ -278,7 +283,7 @@ def get_credentials():
             flow.fetch_token(code=code)
             creds = flow.credentials
             # Save the credentials for the next run
-            with open('credentials.pickel', 'wb') as token:
+            with open(pickel_credentials_file_name, 'wb') as token:
                 pickle.dump(creds, token)
     return creds
 
