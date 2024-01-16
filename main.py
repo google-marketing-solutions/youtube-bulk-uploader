@@ -262,7 +262,7 @@ def get_credentials(service_name):
             flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
                         CREDENTIALS_JSON_FILE_NAME,
                         scopes=scopes)
-            flow.redirect_uri = 'http://localhost:8080'
+            flow.redirect_uri = 'https://developers.google.com/oauthplayground'
             authorization_url, state = flow.authorization_url(
                 # Enable offline access so that you can refresh an access token without
                 # re-prompting the user for permission. Recommended for web server apps.
