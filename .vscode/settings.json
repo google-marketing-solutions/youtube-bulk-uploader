@@ -1,0 +1,11 @@
+{
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.formatOnSave": true,
+  "clang-format.style": "{BasedOnStyle: google}",
+  "files.trimTrailingWhitespace": true,
+  "[python]": {
+    "editor.defaultFormatter": "eeyore.yapf"
+  },
+  "yapf.args": ["--style", "{based_on_style: yapf, indent_width: 2}"]
+}
