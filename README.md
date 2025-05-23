@@ -91,7 +91,7 @@ Create the following folders:
 
 ### Google Sheets
 
-Make a copy of this template: [YouTube Bulk Uploader - Distributable](https://docs.google.com/spreadsheets/d/1umnbFUu87ae1_mL4fzmKaYPEfwI2r5k1HUQ7dX1UNwo/edit)
+Make a copy of this template: [YouTube Bulk Uploader - Distributable](https://docs.google.com/spreadsheets/d/1C2hdQOw6u8nOY3VxwS8_RmwmQZksqJcKBj4XnAwLjD4/edit)
 
 #### Config Tab
 
