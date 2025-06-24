@@ -116,8 +116,8 @@ Populated via "List My Uploads" menu item
 
 1. Clone the repo:
 ```bash
-git clone https://professional-services.googlesource.com/solutions/youtube_bulk_uploader
-cd youtube_bulk_uploader
+git clone https://github.com/google-marketing-solutions/youtube-bulk-uploader.git
+cd youtube-bulk-uploader
 ```
 
 2. Replace `yt_credentials.json` with your downloaded OAuth file from GCP
