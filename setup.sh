@@ -49,6 +49,7 @@ JOB_NAME="youtube-bulk-uploader"
 
 enable_apis() {
   gcloud services enable secretmanager.googleapis.com
+  gcloud services enable cloudbuild.googleapis.com
   gcloud services enable artifactregistry.googleapis.com # required for Gen2 GCF
   gcloud services enable run.googleapis.com # required for Gen2 GCF
   gcloud services enable cloudfunctions.googleapis.com
@@ -66,6 +67,7 @@ set_iam_permissions() {
     roles/artifactregistry.repoAdmin
     roles/iam.serviceAccountUser
     roles/secretmanager.secretAccessor
+    roles/run.invoker
     roles/cloudfunctions.admin
     roles/cloudscheduler.admin
   )
