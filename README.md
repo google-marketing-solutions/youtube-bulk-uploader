@@ -277,7 +277,7 @@ The script will test each of the three APIs and report whether the access was a 
 
 By default, YouTube Data API has a daily quota limit of ~50,000 units (~5-6 videos/day). You can [request a quota increase](https://developers.google.com/youtube/v3/determine_quota_cost) if needed.
 
-## The Cloud Function gets the maximum available execution timeout - 60 minutes, so the processing should fit into that time.
+The Cloud Function gets the maximum available execution timeout - 60 minutes, so the processing should fit into that time.
 
 ## License
 

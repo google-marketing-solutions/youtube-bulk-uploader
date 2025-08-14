@@ -233,8 +233,8 @@ run_job() {
 
 
 deploy_all() {
-#  enable_apis || return $?
-#  set_iam_permissions $@ || return $?
+  enable_apis || return $?
+  set_iam_permissions $@ || return $?
   deploy_functions $@ || return $?
   schedule_job $@ || return $?
 }
