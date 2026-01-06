@@ -178,7 +178,7 @@ For both sections the format of setting names is the same: snake-case.
 
 The script automatically converts the setting names to the correct format for each context:
 
-- **Sheets**: `Drive Root Folder Id`
+- **Sheets**: `Drive Root Folder Id` (case insensitive)
 - **settings.ini**: `drive-root-folder-id`
 - **Environment Variable**: `DRIVE_ROOT_FOLDER_ID`
 - **Job's Argument (JSON key)**: `drive_root_folder_id`

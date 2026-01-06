@@ -21,6 +21,7 @@ import random
 import json
 import functions_framework
 from dataclasses import dataclass, asdict
+from typing import TypedDict, Required, NotRequired, Literal
 from datetime import datetime
 from google.cloud import logging as cloud_logging
 from google.oauth2.credentials import Credentials
@@ -86,6 +87,60 @@ class Config:
   completed_folder_id: str | None = None
 
 
+class DriveUser(TypedDict):
+  """Represents a user in Drive API responses."""
+  kind: str
+  displayName: str
+  photoLink: NotRequired[str]
+  me: NotRequired[bool]
+  permissionId: str
+  emailAddress: NotRequired[str]
+
+
+class Label(TypedDict, total=False):
+  """Information about a label applied to a file."""
+  id: Required[str]
+  revisionId: str
+  kind: str
+  fields: dict[str, "LabelField"]
+
+
+class LabelField(TypedDict, total=False):
+  """A field within a label."""
+  kind: str
+  id: str
+  valueType: Literal["text", "integer", "dateString", "user", "selection"]
+  dateString: list[str]
+  integer: list[int]
+  selection: list[str]
+  text: list[str]
+  user: list[DriveUser]
+
+
+class LabelInfo(TypedDict, total=False):
+  """Label information for a file."""
+  labels: list[Label]
+
+
+class DriveFile(TypedDict, total=False):
+  """
+    Represents a file resource from Google Drive API.
+
+    Using total=False since not all fields are always present.
+    Fields marked as Required are always returned by the API.
+  """
+  # Core identifying fields
+  kind: str  # Always "drive#file"
+  id: Required[str]
+  name: Required[str]
+  mimeType: str  # Required
+  # Metadata
+  description: str
+  properties: dict[str, str]
+  # Labels
+  labelInfo: LabelInfo
+
+
 class UploadError(Exception):
   """Custom exception for upload errors."""
   pass
@@ -108,7 +163,7 @@ def _get_sheet_config_values(sheets_service, spreadsheet_id) -> dict[str, str]:
       if len(row) > 1:
         key = row[0]
         value = row[1]
-        config_values[key] = value
+        config_values[key.upper()] = value
   except HttpError as e:
     logging.warning('Could not read spreadsheet config. Error: %s', e)
   return config_values
@@ -201,7 +256,8 @@ def initialize_config(request) -> Config:
 
     # Spreadsheet (Title Case with spaces)
     if val is None and sheet_values:
-      sheet_key = ' '.join(word.title() for word in key.split('_'))
+      # in sheet_values all keys are upper-cased
+      sheet_key = ' '.join(word.upper() for word in key.split('_'))
       val = sheet_values.get(sheet_key)
 
     # Environment variable (UPPER_CASE)
@@ -364,7 +420,8 @@ def get_youtube_videos(youtube_service, channel_id):
   return videos
 
 
-def recursive_drive_search(drive_service, folder_id, label_ids):
+def recursive_drive_search(drive_service, folder_id,
+                           label_ids) -> list[DriveFile]:
   """Recursively finds all video files in a Google Drive folder."""
   videos = []
   page_token = None
@@ -561,7 +618,7 @@ def main(request):
   logging.debug(drive_videos)
 
   # 5. Determine which videos are new
-  videos_to_upload = []
+  videos_to_upload: list[DriveFile] = []
   for video in drive_videos:
     video_name_without_ext = os.path.splitext(video['name'])[0]
     if video_name_without_ext not in youtube_video_ids:
